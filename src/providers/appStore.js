@@ -38,10 +38,12 @@ class AppStoreProvider implements IProvider {
           if (json.resultCount) {
             const version = json.results[0].version;
             const appId = json.results[0].trackId;
+            const releaseDate = Date.parse(json.results[0].currentVersionReleaseDate);
             const storeUrl = `itms-apps://apps.apple.com/${countryCode}app/id${appId}`;
             return Promise.resolve({
               version,
               storeUrl,
+              releaseDate,
             });
           }
           return Promise.reject('No info about this app.');

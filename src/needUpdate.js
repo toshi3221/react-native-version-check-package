@@ -38,6 +38,7 @@ export type NeedUpdateResult = {
   storeUrl: string,
   currentVersion: string,
   latestVersion: string,
+  latestReleaseDate: number,
 };
 
 export default async function needUpdate(
@@ -59,31 +60,37 @@ export default async function needUpdate(
 
     let latestVersion;
     let providerStoreUrl = '';
+    let latestReleaseDate;
 
     if (isNil(option.latestVersion)) {
       if (option.provider.getVersion) {
         const {
           version,
           storeUrl,
+          releaseDate,
         }: IVersionAndStoreUrl = await option.provider.getVersion(option);
         latestVersion = version;
         providerStoreUrl = storeUrl;
+        latestReleaseDate = releaseDate;
       }
 
       if (providers[option.provider]) {
-        const { version, storeUrl }: IVersionAndStoreUrl = await providers[
+        const { version, storeUrl, releaseDate }: IVersionAndStoreUrl = await providers[
           option.provider
         ].getVersion(option);
         latestVersion = version;
         providerStoreUrl = storeUrl;
+        latestReleaseDate = releaseDate;
       }
 
       option.latestVersion = latestVersion || (await getLatestVersion(option));
+      option.latestReleaseDate = latestReleaseDate || undefined;
     }
 
     return checkIfUpdateNeeded(
       option.currentVersion,
       option.latestVersion,
+      option.latestReleaseDate,
       option,
       providerStoreUrl
     );
@@ -99,6 +106,7 @@ export default async function needUpdate(
 function checkIfUpdateNeeded(
   currentVersion,
   latestVersion,
+  latestReleaseDate,
   option,
   providerStoreUrl
 ) {
@@ -116,6 +124,7 @@ function checkIfUpdateNeeded(
     storeUrl: providerStoreUrl,
     currentVersion,
     latestVersion,
+    latestReleaseDate,
   };
 
   return Promise.resolve(response);

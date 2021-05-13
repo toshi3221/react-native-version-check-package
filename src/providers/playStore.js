@@ -38,7 +38,10 @@ class PlayStoreProvider implements IProvider {
           if (match) {
             const latestVersion = match[1].trim();
 
-            return Promise.resolve({ version: latestVersion, storeUrl });
+            const updatedMatch = text.match(/Updated.+?>([ ,0-9a-zA-Z]+)<\/span>/);
+            const releaseDate = Date.parse(updatedMatch && updatedMatch[1]);
+
+            return Promise.resolve({ version: latestVersion, storeUrl, releaseDate });
           }
 
           return Promise.reject(error(text));
